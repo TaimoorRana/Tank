@@ -76,15 +76,20 @@ public class TankShooting : NetworkBehaviour
 	[Command]
 	private void CmdCreateBullets()
     {
-		
+		RpclocalBullet ();
+
+
+
+    }
+
+	[ClientRpc]
+	private void RpclocalBullet(){
 		GameObject shellInstance = (GameObject)
 			Instantiate (m_Shell, m_FireTransform.position, m_FireTransform.rotation) ;
 		// Set the shell's velocity to the launch force in the fire position's forward direction.
 		shellInstance.GetComponent<Rigidbody>().velocity = m_CurrentLaunchForce * m_FireTransform.forward; 
 
+		//NetworkServer.Spawn (shellInstance);
+	}
 
-		NetworkServer.Spawn (shellInstance);
-
-
-    }
 }

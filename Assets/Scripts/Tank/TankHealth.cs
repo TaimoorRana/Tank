@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class TankHealth : MonoBehaviour
 {
-    public float m_StartingHealth = 100f;          
+    public float m_StartingHealth = 200f;          
     public Slider m_Slider;                        
     public Image m_FillImage;                      
     public Color m_FullHealthColor = Color.green;  
@@ -37,7 +37,7 @@ public class TankHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     { 
-		m_CurrentHealth -= amount;
+		m_CurrentHealth -= amount ;
 		SetHealthUI ();
 
 		if (m_CurrentHealth <= 0f && !m_Dead) {

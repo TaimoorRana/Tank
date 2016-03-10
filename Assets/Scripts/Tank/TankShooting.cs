@@ -11,8 +11,8 @@ public class TankShooting : NetworkBehaviour
     public AudioSource m_ShootingAudio;  
     public AudioClip m_ChargingClip;     
     public AudioClip m_FireClip;         
-    public float m_MinLaunchForce = 50f; 
-    public float m_MaxLaunchForce = 100f; 
+    public float m_MinLaunchForce = 1000f; 
+    public float m_MaxLaunchForce = 1000f; 
     public float m_MaxChargeTime = 0.75f;
 
     
@@ -87,7 +87,7 @@ public class TankShooting : NetworkBehaviour
 		GameObject shellInstance = (GameObject)
 			Instantiate (m_Shell, m_FireTransform.position, m_FireTransform.rotation) ;
 		// Set the shell's velocity to the launch force in the fire position's forward direction.
-		shellInstance.GetComponent<Rigidbody>().velocity = m_CurrentLaunchForce * m_FireTransform.forward; 
+		shellInstance.GetComponent<Rigidbody>().velocity = 25f * m_FireTransform.forward; 
 
 		//NetworkServer.Spawn (shellInstance);
 	}

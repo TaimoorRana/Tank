@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class TankHealth : MonoBehaviour
+public class TankHealth : NetworkBehaviour
 {
     public float m_StartingHealth = 200f;          
     public Slider m_Slider;                        
@@ -41,7 +42,7 @@ public class TankHealth : MonoBehaviour
 		SetHealthUI ();
 
 		if (m_CurrentHealth <= 0f && !m_Dead) {
-			OnDeath ();
+			CmdOnDeath ();
 		}
     }
 
@@ -53,8 +54,13 @@ public class TankHealth : MonoBehaviour
 		m_FillImage.color = Color.Lerp (m_ZeroHealthColor, m_FullHealthColor, m_CurrentHealth / m_StartingHealth);
     }
 
+	[Command]
+	private void CmdOnDeath(){
+		RpcOnDeath ();
+	}
 
-    private void OnDeath()
+
+    private void RpcOnDeath()
     {
         // Play the effects for the death of the tank and deactivate it.
 		m_Dead = true;

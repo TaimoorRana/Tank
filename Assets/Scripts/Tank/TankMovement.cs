@@ -18,7 +18,6 @@ public class TankMovement : NetworkBehaviour
     private float m_MovementInputValue;    
     private float m_TurnInputValue;        
     private float m_OriginalPitch;  
-	public Transform[] spawnLocations;
 
 	public override void OnStartLocalPlayer ()
 	{
@@ -55,14 +54,12 @@ public class TankMovement : NetworkBehaviour
 
         m_OriginalPitch = m_MovementAudio.pitch;
 		if (isServer) {
-			transform.position = spawnLocations [0].position;
 			if (isLocalPlayer) {
 				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.blue;
 			} else {
 				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
 			}
 		} else {
-			transform.position = spawnLocations [1].position;
 			if (isLocalPlayer) {
 				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
 			} else {

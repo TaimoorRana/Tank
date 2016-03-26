@@ -13,7 +13,8 @@ public class TankHealth : NetworkBehaviour
     
     
     private AudioSource m_ExplosionAudio;          
-    private ParticleSystem m_ExplosionParticles;   
+    private ParticleSystem m_ExplosionParticles;  
+	[SyncVar]
     private float m_CurrentHealth;  
     private bool m_Dead;            
 
@@ -59,17 +60,18 @@ public class TankHealth : NetworkBehaviour
 		RpcOnDeath ();
 	}
 
-
+	[ClientRpc]
     private void RpcOnDeath()
     {
         // Play the effects for the death of the tank and deactivate it.
 		m_Dead = true;
 		Debug.Log ("OnDeath");
+		GameObject.FindObjectOfType<CameraControl> ().removePlayer (gameObject);
 		m_ExplosionParticles.transform.position = transform.position;
 		m_ExplosionPrefab.SetActive (true);
 		m_ExplosionAudio.Play ();
 		m_ExplosionParticles.Play ();
 		gameObject.SetActive (false);
-		Destroy (gameObject);
+		NetworkServer.Destroy(gameObject);
     }
 }

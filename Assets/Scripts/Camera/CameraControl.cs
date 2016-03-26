@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using System.Collections.Generic;
 
-
-public class CameraControl : MonoBehaviour
+public class CameraControl : NetworkBehaviour
 {
     public float m_DampTime = 0.2f;                 
     public float m_ScreenEdgeBuffer = 4f;           
-    public float m_MinSize = 6.5f;                  
-	/*[HideInInspector]*/ public Transform[] m_Targets = new Transform[2]; 
-	public int totalTank = 0;
+    public float m_MinSize = 6.5f; 
+	private List<Transform> m_Targets = new List<Transform>() ; 
 
 
 
@@ -21,31 +20,28 @@ public class CameraControl : MonoBehaviour
     private void Awake()
     {
         m_Camera = GetComponentInChildren<Camera>();
-		totalTank = 0;
-		m_Targets [0] = null;
-		m_Targets [1] = null;
     }
 
 
     private void FixedUpdate()
     {
-		if (m_Targets [1] == null) {
-			GameObject[] objects = GameObject.FindGameObjectsWithTag ("Player");
-			foreach (GameObject o in objects) {
-				if (o.GetComponent<TankMovement> () && !found(o)) {
-					
-					m_Targets [totalTank] = o.GetComponent<Transform> ();
-					totalTank++;
-					Debug.Log ("tank " + totalTank + " : " + o.name);
-				}
-				//Debug.Log ("test");
-			}
-
+		addPlayers();
+		if (m_Targets.Count <= 1)
 			return;
-		}
         Move();
         Zoom();
     }
+
+	private void addPlayers(){
+		
+		GameObject[] objects = GameObject.FindGameObjectsWithTag ("Player");
+		foreach (GameObject o in objects) {
+			if (o.GetComponent<TankMovement> () && !found(o)) {
+				m_Targets.Add(o.GetComponent<Transform> ());
+				Debug.Log ("tank  : " + o.name);
+			}
+		}
+	}
 
 	private bool found (GameObject o){
 		foreach (Transform t in m_Targets) {
@@ -59,11 +55,18 @@ public class CameraControl : MonoBehaviour
 		return false;
 	}
 
+	public void removePlayer(GameObject player){
+		if (found (player)) {
+			m_Targets.Remove (player.GetComponent<Transform> ());
+		}
+	}
+
 
 
     private void Move()
     {
-        FindAveragePosition();
+		
+	    FindAveragePosition ();
 
         transform.position = Vector3.SmoothDamp(transform.position, m_DesiredPosition, ref m_MoveVelocity, m_DampTime);
     }
@@ -71,11 +74,14 @@ public class CameraControl : MonoBehaviour
 
     private void FindAveragePosition()
     {
-		//Debug.Log ("FindAveragePosition");
+		if (m_Targets.Count == 1) {
+			m_DesiredPosition = m_Targets [0].position;
+			return;
+		}
         Vector3 averagePos = new Vector3();
         int numTargets = 0;
 
-        for (int i = 0; i < m_Targets.Length; i++)
+		for (int i = 0; i < m_Targets.Count; i++)
         {
             if (!m_Targets[i].gameObject.activeSelf)
                 continue;
@@ -106,7 +112,7 @@ public class CameraControl : MonoBehaviour
 
         float size = 0f;
 
-        for (int i = 0; i < m_Targets.Length; i++)
+        for (int i = 0; i < m_Targets.Count; i++)
         {
             if (!m_Targets[i].gameObject.activeSelf)
                 continue;

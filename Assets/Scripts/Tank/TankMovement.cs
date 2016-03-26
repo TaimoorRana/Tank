@@ -17,17 +17,20 @@ public class TankMovement : NetworkBehaviour
     private Rigidbody m_Rigidbody;         
     private float m_MovementInputValue;    
     private float m_TurnInputValue;        
-    private float m_OriginalPitch;         
+    private float m_OriginalPitch;  
+	public Transform[] spawnLocations;
 
 	public override void OnStartLocalPlayer ()
 	{
 		base.OnStartLocalPlayer ();
+
 
 	}
 
     private void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+
     }
 
 
@@ -51,6 +54,22 @@ public class TankMovement : NetworkBehaviour
         m_TurnAxisName = "Horizontal" + m_PlayerNumber;
 
         m_OriginalPitch = m_MovementAudio.pitch;
+		if (isServer) {
+			transform.position = spawnLocations [0].position;
+			if (isLocalPlayer) {
+				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.blue;
+			} else {
+				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
+			}
+		} else {
+			transform.position = spawnLocations [1].position;
+			if (isLocalPlayer) {
+				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
+			} else {
+				this.GetComponentInChildren<MeshRenderer> ().material.color = Color.blue;
+			}
+		}
+
     }
     
 
@@ -60,7 +79,7 @@ public class TankMovement : NetworkBehaviour
 		if (!isLocalPlayer) {
 			return;
 		}
-		this.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
+		//this.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
 		m_MovementInputValue = Input.GetAxis(m_MovementAxisName);
 		m_TurnInputValue = Input.GetAxis (m_TurnAxisName);
 
@@ -110,4 +129,5 @@ public class TankMovement : NetworkBehaviour
 		Quaternion turnRotation = Quaternion.Euler (0f, turn, 0f);
 		m_Rigidbody.MoveRotation (m_Rigidbody.rotation * turnRotation);
     }
+		
 }

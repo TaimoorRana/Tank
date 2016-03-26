@@ -26,7 +26,7 @@ public class CameraControl : NetworkBehaviour
     private void FixedUpdate()
     {
 		addPlayers();
-		if (m_Targets.Count <= 1)
+		if (m_Targets.Count <= 0)
 			return;
         Move();
         Zoom();

@@ -10,14 +10,23 @@ public class TankHealth : NetworkBehaviour
     public Color m_FullHealthColor = Color.green;  
     public Color m_ZeroHealthColor = Color.red;    
     public GameObject m_ExplosionPrefab;
-    
+	private Vector3 initialPosition;
     
     private AudioSource m_ExplosionAudio;          
     private ParticleSystem m_ExplosionParticles;  
 	[SyncVar]
     private float m_CurrentHealth;  
-    private bool m_Dead;            
+    private bool m_Dead;
+	private ScoreManager scoreManager;
+	private static int idCounter = 0;
+	private int id = 0;
 
+	public void Start(){
+		initialPosition = transform.position;
+		scoreManager = GameObject.FindObjectOfType<ScoreManager> ();
+		idCounter++;
+		id = idCounter;
+	}
 
     private void Awake()
     {
@@ -32,7 +41,6 @@ public class TankHealth : NetworkBehaviour
     {
         m_CurrentHealth = m_StartingHealth;
         m_Dead = false;
-
         SetHealthUI();
     }
     
@@ -46,7 +54,11 @@ public class TankHealth : NetworkBehaviour
 			CmdOnDeath ();
 		}
     }
-
+		
+	private void OnReset(){
+		transform.position = initialPosition;
+		OnEnable ();
+	}
 
     private void SetHealthUI()
     {
@@ -66,12 +78,17 @@ public class TankHealth : NetworkBehaviour
         // Play the effects for the death of the tank and deactivate it.
 		m_Dead = true;
 		Debug.Log ("OnDeath");
-		GameObject.FindObjectOfType<CameraControl> ().removePlayer (gameObject);
+		//GameObject.FindObjectOfType<CameraControl> ().removePlayer (gameObject);
 		m_ExplosionParticles.transform.position = transform.position;
 		m_ExplosionPrefab.SetActive (true);
 		m_ExplosionAudio.Play ();
 		m_ExplosionParticles.Play ();
-		gameObject.SetActive (false);
-		NetworkServer.Destroy(gameObject);
+		OnReset();
+		if (id == 2) {
+			scoreManager.player1Won ();
+		} else {
+			scoreManager.player2Won ();
+		}
+			
     }
 }
